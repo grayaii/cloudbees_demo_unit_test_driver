@@ -6,8 +6,27 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
 from common import parseArgs, say, build_job
 
 
+def update_in_progress_file(aStr=None, q=None):
+    # This file is used if the driver job gets cancelled.
+    # The cleanup post build script uses this file to abort the running worker jobs.
+    if aStr is not None:
+        with open(os.path.join('unit_test_workers_file.txt'), 'a') as fd:
+            fd.write(aStr)
+    else:
+        # We need to remove the queue item and add the build number:
+        new_contents = []
+        with open(os.path.join('unit_test_workers_file.txt'), 'r') as fd:
+            for line in fd:
+                if line.split(',')[1].strip() != q.baseurl:
+                    new_contents.append(line)
+        with open(os.path.join('unit_test_workers_file.txt'), 'w') as fd:
+            for line in new_contents:
+                fd.write(line)
+        # Add the build number:
+        update_in_progress_file(aStr='{0},{1}\n'.format(args.unit_test_driver, q=q.get_build().get_number()))
+
 def kick_off_jobs(test_file):
-    say('Kicking off all the workers...', banner='*')
+    say('Kicking off all the workers...', banner='*', color='green')
     ret_jenkins_queue_jobs = []
     # Get all the tests from the tests.txt:
     all_tests = []
@@ -34,19 +53,20 @@ def kick_off_jobs(test_file):
                       username=args.jenkins_username,
                       password=args.jenkins_password)
         ret_jenkins_queue_jobs.append(r)
-        #update_in_progress_file(aStr='{0},{1}\n'.format(args.worker_job, r.baseurl))
+        update_in_progress_file(aStr='{0},{1}\n'.format(args.worker_job, r.baseurl))
     return ret_jenkins_queue_jobs
 
 def driver(test_file):
     # Kick off all jenkins jobs:
     jenkins_queue_jobs = kick_off_jobs(test_file)
-    say('Waiting for all worker jobs to get off the jenkins queue...', banner='*')
-    results = []
+    say('Waiting for all worker jobs to get off the jenkins queue...', banner='*', color='green')
+    builds = []
     for q in jenkins_queue_jobs:
         while True:
             try:
                 q.poll()
-                results.append(q.get_build())
+                builds.append(q.get_build())
+                update_in_progress_file(aStr=None, q=q)
                 break
             except NotBuiltYet:
                 say('still on the queue: {0}'.format(q))
@@ -59,27 +79,28 @@ def driver(test_file):
                     say('breaking out of loop for this item on the queue...')
                     break
 
-    say('All jobs off the queue! Waiting for all jobs to finish...', banner='*')
+    say('All jobs off the queue! Waiting for all jobs to finish...', banner='*', color='green')
     ret_code = 0
     master_results = []
-    while len(results) > 0:
+    while len(builds) > 0:
         say('*' * 75)
-        for r in results:
-            r.poll()
-            if r.is_running() is True:
-                say('Still building: {0} url: {1}'.format(r.name, r.baseurl))
+        for b in builds:
+            b.poll()
+            if b.is_running() is True:
+                say('Still building: {0} url: {1}'.format(b.name, b.baseurl))
                 isBuilding = True
+                time.sleep(15)
             else:
                 # It takes one more poll to get the results:
-                r.poll()
-                say('Build Done: {0} status: {1}'.format(r.baseurl, r.get_status()))
+                b.poll()
+                say('Build Done: {0} status: {1}'.format(b.baseurl, b.get_status()))
                 say('Downloading artifacts...')
-                artifact_dict = r.get_artifact_dict()
+                artifact_dict = b.get_artifact_dict()
                 if 'spot_instance_termination_imminent.txt' in artifact_dict:
                     say('spot_instance_termination_imminent.txt in artifact. We must kick off new worker...')
                     # Uh-oh. Worker died due to spot instance dying.
                     # re-kick this job and wait till it's off the queue and building:
-                    actions = r.get_data(r.baseurl + '/api/python')['actions']
+                    actions = b.get_data(b.baseurl + '/api/python')['actions']
                     params = {}
                     for action in actions:
                         if 'parameters' in action:
@@ -96,7 +117,7 @@ def driver(test_file):
                     while True:
                         try:
                             q.poll()
-                            results.append(q.get_build())
+                            builds.append(q.get_build())
                             update_in_progress_file(aStr=None, q=q)
                             break
                         except NotBuiltYet:
@@ -123,13 +144,12 @@ def driver(test_file):
                                 time.sleep(3)
                 # Regardless of what happened, the worker is done, so
                 # take it off the list
-                if r.get_status() != 'SUCCESS':
+                if b.get_status() != 'SUCCESS':
                     ret_code += 1
+                master_results.append(b)
+                builds.remove(b)
 
-                master_results.append(r)
-                results.remove(r)
-        time.sleep(30)
-    say('Results', banner='*')
+    say('Results', banner='*', color='green')
     for build in master_results:
         say('Status: {0}, URL: {1}'.format(build.get_status(), build.baseurl))
     say('All done!')
