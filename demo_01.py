@@ -7,7 +7,7 @@ from common import parseArgs, say, build_job
 
 
 def kick_off_jobs(test_file):
-    say('Kicking off all the workers...', banner='*')
+    say('Kicking off all the workers...', banner='*', color='green')
     ret_jenkins_queue_jobs = []
     # Get all the tests from the tests.txt:
     all_tests = []
@@ -39,7 +39,7 @@ def kick_off_jobs(test_file):
 def driver(test_file):
     # Kick off all jenkins jobs:
     jenkins_queue_jobs = kick_off_jobs(test_file)
-    say('Waiting for all worker jobs to get off the jenkins queue...', banner='*')
+    say('Waiting for all worker jobs to get off the jenkins queue...', banner='*', color='green')
     builds = []
     for q in jenkins_queue_jobs:
         while True:
@@ -58,7 +58,7 @@ def driver(test_file):
                     say('breaking out of loop for this item on the queue...')
                     break
 
-    say('All jobs off the queue! Waiting for all jobs to finish...', banner='*')
+    say('All jobs off the queue! Waiting for all jobs to finish...', banner='*', color='green')
     ret_code = 0
     master_results = []
     while len(builds) > 0:
@@ -80,7 +80,7 @@ def driver(test_file):
                 master_results.append(b)
                 builds.remove(b)
 
-    say('Results', banner='*')
+    say('Results', banner='*', color='green')
     for build in master_results:
         say('Status: {0}, URL: {1}'.format(build.get_status(), build.baseurl))
     say('All done!')

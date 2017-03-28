@@ -22,6 +22,7 @@ def parseArgs():
 def run(cmd):
         output = None
         returncode = None
+        say('Running command: {}'.format(cmd))
         try:
             p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
             output = p.communicate()[0]
