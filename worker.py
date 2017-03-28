@@ -13,7 +13,8 @@ from common import say
 # Parse command line args:
 def parseArgs():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--build_number', help='Build number. Only used to generate unique results file.', default='0')
+    parser.add_argument('--build_number', help='Build number. Only used to generate unique results file.',
+                        default=os.environ.get('UPSTREAM_BUILD_NUMBER', '0'))
     args = parser.parse_args()
     return args
 
