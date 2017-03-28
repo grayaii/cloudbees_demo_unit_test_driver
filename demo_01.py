@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 from jenkinsapi.custom_exceptions import NotBuiltYet
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
 from common import parseArgs, say, build_job
@@ -23,7 +24,7 @@ def kick_off_jobs(test_file):
         # For each test group, call a jenkins job to run them sequencially:
         params = {
             'GIT_HASH': args.git_hash,
-            'UPSTREAM_BUILD_NUMBER': os.environ['BUILD_NUMBER'],
+            'UPSTREAM_BUILD_NUMBER': os.environ.get('BUILD_NUMBER', 'manual'),
             'TEST': test
         }
         # Put these jobs on the queue:
