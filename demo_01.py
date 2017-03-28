@@ -63,7 +63,7 @@ def driver(test_file):
     master_results = []
     while len(builds) > 0:
         say('*' * 75)
-        for r in builds:
+        for b in builds:
             b.poll()
             if b.is_running() is True:
                 say('Still building: {0} url: {1}'.format(b.name, b.baseurl))
