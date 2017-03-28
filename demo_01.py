@@ -34,19 +34,18 @@ def kick_off_jobs(test_file):
                       username=args.jenkins_username,
                       password=args.jenkins_password)
         ret_jenkins_queue_jobs.append(r)
-        #update_in_progress_file(aStr='{0},{1}\n'.format(args.worker_job, r.baseurl))
     return ret_jenkins_queue_jobs
 
 def driver(test_file):
     # Kick off all jenkins jobs:
     jenkins_queue_jobs = kick_off_jobs(test_file)
     say('Waiting for all worker jobs to get off the jenkins queue...', banner='*')
-    results = []
+    builds = []
     for q in jenkins_queue_jobs:
         while True:
             try:
                 q.poll()
-                results.append(q.get_build())
+                builds.append(q.get_build())
                 break
             except NotBuiltYet:
                 say('still on the queue: {0}'.format(q))
@@ -62,24 +61,25 @@ def driver(test_file):
     say('All jobs off the queue! Waiting for all jobs to finish...', banner='*')
     ret_code = 0
     master_results = []
-    while len(results) > 0:
+    while len(builds) > 0:
         say('*' * 75)
-        for r in results:
-            r.poll()
-            if r.is_running() is True:
-                say('Still building: {0} url: {1}'.format(r.name, r.baseurl))
+        for r in builds:
+            b.poll()
+            if b.is_running() is True:
+                say('Still building: {0} url: {1}'.format(b.name, b.baseurl))
                 isBuilding = True
+                time.sleep(15)
             else:
                 # It takes one more poll to get the results:
-                r.poll()
-                say('Build Done: {0} status: {1}'.format(r.baseurl, r.get_status()))
+                b.poll()
+                say('Build Done: {0} status: {1}'.format(b.baseurl, b.get_status()))
                 # Regardless of what happened, the worker is done, so
                 # take it off the list
-                if r.get_status() != 'SUCCESS':
+                if b.get_status() != 'SUCCESS':
                     ret_code += 1
                 master_results.append(r)
-                results.remove(r)
-        time.sleep(30)
+                builds.remove(r)
+
     say('Results', banner='*')
     for build in master_results:
         say('Status: {0}, URL: {1}'.format(build.get_status(), build.baseurl))
