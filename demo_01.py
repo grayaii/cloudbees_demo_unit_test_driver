@@ -77,8 +77,8 @@ def driver(test_file):
                 # take it off the list
                 if b.get_status() != 'SUCCESS':
                     ret_code += 1
-                master_results.append(r)
-                builds.remove(r)
+                master_results.append(b)
+                builds.remove(b)
 
     say('Results', banner='*')
     for build in master_results:
