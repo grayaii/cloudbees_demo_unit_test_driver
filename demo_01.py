@@ -28,12 +28,12 @@ def kick_off_jobs(test_file):
         }
         # Put these jobs on the queue:
         r = build_job(host=args.jenkins_host,
-                      build_name=args.unit_test_driver,
+                      build_name=args.worker_job,
                       params=params,
                       username=args.jenkins_username,
                       password=args.jenkins_password)
         ret_jenkins_queue_jobs.append(r)
-        #update_in_progress_file(aStr='{0},{1}\n'.format(args.unit_test_driver, r.baseurl))
+        #update_in_progress_file(aStr='{0},{1}\n'.format(args.worker_job, r.baseurl))
     return ret_jenkins_queue_jobs
 
 def driver(test_file):
