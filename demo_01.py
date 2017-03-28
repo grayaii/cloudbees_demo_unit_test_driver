@@ -2,7 +2,7 @@ import os
 import sys
 from jenkinsapi.custom_exceptions import NotBuiltYet
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
-from common import parseArgs
+from common import parseArgs, say, build_job
 
 
 def kick_off_jobs(test_file):
