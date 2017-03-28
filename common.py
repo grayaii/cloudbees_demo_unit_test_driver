@@ -19,6 +19,8 @@ def parseArgs():
     parser.add_argument('--jenkins_host', help='Jenkins host.', default=os.environ['JENKINS_URL'])
     parser.add_argument('--git_hash', help='Git Hash.', default=os.environ['JENKINS_URL'])
     parser.add_argument('--worker_job', help='The job that does the work', default='unit-test-worker')
+    parser.add_argument('--unit_test_file', help='File containing unit tests',
+                        default=os.path.join(os.path.dirname(__file__), '..', 'my_app', 'unit_tests.txt'))
     args = parser.parse_args()
     return args
 
