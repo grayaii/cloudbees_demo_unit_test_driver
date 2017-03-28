@@ -159,4 +159,5 @@ def driver(test_file):
 
 if __name__ == '__main__':
     args = parseArgs()
-    driver(test_file=args.unit_test_file)
+    ret_code = driver(test_file=args.unit_test_file)
+    sys.exit(ret_code)
