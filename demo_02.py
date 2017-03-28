@@ -24,7 +24,7 @@ def update_in_progress_file(aStr=None, q=None):
             for line in new_contents:
                 fd.write(line)
         # Add the build number:
-        update_in_progress_file(aStr='{0},{1}\n'.format(args.unit_test_driver, q=q.get_build().get_number()))
+        update_in_progress_file(aStr='{0},{1}\n'.format(args.worker_job, q=q.get_build().get_number()))
 
 def kick_off_jobs(test_file):
     say('Kicking off all the workers...', banner='*', color='green')
@@ -110,7 +110,7 @@ def driver(test_file):
                         break
                     # Put this jobs on the queue:
                     q = build_job(host=args.jenkins_host,
-                                  build_name=args.unit_test_driver,
+                                  build_name=args.worker_job,
                                   params=params,
                                   username=args.jenkins_username,
                                   password=args.jenkins_password)
