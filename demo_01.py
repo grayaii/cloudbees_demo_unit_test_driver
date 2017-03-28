@@ -32,7 +32,7 @@ def kick_off_jobs(test_file, num_of_workers):
         params = {
             'GIT_HASH': args.git_hash,
             'UPSTREAM_BUILD_NUMBER': os.environ['BUILD_NUMBER'],
-            'TEST': test)
+            'TEST': test
         }
         # Put these jobs on the queue:
         r = build_job(host=args.jenkins_host,
