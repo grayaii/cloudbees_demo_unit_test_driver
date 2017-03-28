@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
 from common import parseArgs
 
 
-def kick_off_jobs(test_file, num_of_workers):
+def kick_off_jobs(test_file):
     say('Kicking off all the workers...', banner='*')
     ret_jenkins_queue_jobs = []
     # Get all the tests from the tests.txt:
@@ -15,17 +15,9 @@ def kick_off_jobs(test_file, num_of_workers):
             if test.strip() != '':
                 all_tests.append(test.strip())
     say('num of tests  : {}'.format(len(all_tests)))
-    say('num of workers: {}'.format(num_of_workers))
     say('These are the tests that set to be executed on this run:')
     for test in all_tests:
         say('test: {0}'.format(test))
-
-    # Now that we have all the tests that we want to run,
-    # Lets distribute the tests based on historical results.
-    if num_of_workers > len(all_tests):
-        num_of_workers = len(all_tests)
-        say('Num of workers is greater than number of tests.')
-        say('New number of workers is: {0}'.format(num_of_workers))
 
     for test in all_tests:
         # For each test group, call a jenkins job to run them sequencially:
@@ -44,9 +36,9 @@ def kick_off_jobs(test_file, num_of_workers):
         #update_in_progress_file(aStr='{0},{1}\n'.format(args.unit_test_driver, r.baseurl))
     return ret_jenkins_queue_jobs
 
-def driver(test_file, num_of_workers):
+def driver(test_file):
     # Kick off all jenkins jobs:
-    jenkins_queue_jobs = kick_off_jobs(test_file, num_of_workers)
+    jenkins_queue_jobs = kick_off_jobs(test_file)
     say('Waiting for all worker jobs to get off the jenkins queue...', banner='*')
     results = []
     for q in jenkins_queue_jobs:
@@ -146,4 +138,4 @@ def driver(test_file, num_of_workers):
 
 if __name__ == '__main__':
     args = parseArgs()
-    driver()
+    driver(test_file=args.unit_test_file)
