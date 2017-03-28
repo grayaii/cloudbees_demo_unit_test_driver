@@ -30,17 +30,12 @@ def parseArgs():
 
 # We need to flush stdout for Jenkins:
 def say(s, banner=None, color=None, use_termcolor=True):
-    raw_s = s
     if banner is not None:
         s = '{}\n{}\n{}'.format(banner * 50, str(s), banner * 50)
-
     # If termcolor package is installed, use it:
     if btermcolor and use_termcolor is True:
         s = termcolor.colored(str(s), color=color, attrs=['bold', 'dark'])
-
-    if file_name is not None:
-        with open(file_name, 'a+') as fd:
-            fd.write(str(raw_s) + '\n')
+    print(s)
     sys.stdout.flush()
 
 
