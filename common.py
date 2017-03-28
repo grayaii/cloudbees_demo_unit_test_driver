@@ -13,11 +13,14 @@ g_jenkins_job = None
 
 # Parse command line args:
 def parseArgs():
+    # Sometimes, you just want to kick off the build outside of a PR:
+    git_hash = os.environ.get('ghprbActualCommit','master')
+
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--jenkins_username', help='Jenkins username.', default='alex.gray')
     parser.add_argument('--jenkins_password', help='Jenkins password.', default=os.environ['JENKINS_PASSWORD'])
     parser.add_argument('--jenkins_host', help='Jenkins host.', default=os.environ['JENKINS_URL'])
-    parser.add_argument('--git_hash', help='Git Hash.', default=os.environ['ghprbActualCommit'])
+    parser.add_argument('--git_hash', help='Git Hash.', default=git_hash)
     parser.add_argument('--worker_job', help='The job that does the work', default='unit-test-worker')
     parser.add_argument('--unit_test_file', help='File containing unit tests',
                         default=os.path.join(os.path.dirname(__file__), '..', 'my_app', 'unit_tests.txt'))
