@@ -69,7 +69,7 @@ def driver(test_file):
             if b.is_running() is True:
                 say('Still building: {0} url: {1}'.format(b.name, b.baseurl))
                 isBuilding = True
-                time.sleep(15)
+                time.sleep(10)
             else:
                 # It takes one more poll to get the results:
                 b.poll()
