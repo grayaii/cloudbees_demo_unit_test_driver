@@ -40,7 +40,7 @@ def stop_all_workers(unit_test_workers_file, jenkins_host, jenkins_username, jen
         if jenkins_host in queue_url:
             q = None
             try:
-                say('Creating queue item: {0}'.format(queue_url))
+                say('Getting queue item: {0}'.format(queue_url))
                 q = jenkinsapi.queue.QueueItem(queue_url, J)
             except jenkinsapi.custom_exceptions.JenkinsAPIException as ex:
                 if 'Powered by Jetty' in ex.message:
