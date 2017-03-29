@@ -26,6 +26,7 @@ def update_in_progress_file(aStr=None, q=None):
         # Add the build number:
         update_in_progress_file(aStr='{},{}\n'.format(args.worker_job, q.get_build().get_number()))
 
+
 def kick_off_jobs(test_file):
     say('Kicking off all the workers...', banner='*', color='green')
     ret_jenkins_queue_jobs = []
@@ -56,6 +57,7 @@ def kick_off_jobs(test_file):
         ret_jenkins_queue_jobs.append(r)
         update_in_progress_file(aStr='{0},{1}\n'.format(args.worker_job, r.baseurl))
     return ret_jenkins_queue_jobs
+
 
 def driver(test_file):
     # Kick off all jenkins jobs:

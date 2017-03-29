@@ -11,6 +11,7 @@ except:
 g_jenkins = None
 g_jenkins_job = None
 
+
 # Parse command line args:
 def parseArgs():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -21,7 +22,7 @@ def parseArgs():
     parser.add_argument('--jenkins_host', help='Jenkins host.',
                         default=os.environ.get('JENKINS_URL', 'Unknown user'))
     parser.add_argument('--git_hash', help='Git Hash.',
-                        default=os.environ.get('ghprbActualCommit','master'))
+                        default=os.environ.get('ghprbActualCommit', 'master'))
     parser.add_argument('--worker_job', help='The job that does the work',
                         default='unit-test-worker')
     parser.add_argument('--unit_test_file', help='File containing unit tests',
